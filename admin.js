@@ -138,13 +138,13 @@ async function loadUsers() {
     ? users
         .map(
           (u) => `<tr>
-            <td>${u.name || "—"}</td>
-            <td>${u.email}</td>
-            <td>$${fmtMoney(u.demoBalance)}</td>
-            <td>$${fmtMoney(u.realBalance)}</td>
-            <td>${pill(u.status)}</td>
-            <td>${fmtDate(u.createdAt)}</td>
-            <td><button class="link-btn" onclick="openUser('${u._id}')">View</button></td>
+            <td data-label="Name">${u.name || "—"}</td>
+            <td data-label="Email">${u.email}</td>
+            <td data-label="Demo">$${fmtMoney(u.demoBalance)}</td>
+            <td data-label="Real">$${fmtMoney(u.realBalance)}</td>
+            <td data-label="Status">${pill(u.status)}</td>
+            <td data-label="Joined">${fmtDate(u.createdAt)}</td>
+            <td data-label="" class="cell-actions"><button class="link-btn" onclick="openUser('${u._id}')">View</button></td>
           </tr>`
         )
         .join("")
@@ -287,20 +287,20 @@ async function loadPayments(type, tableSel, withActions) {
     ? payments
         .map(
           (p) => `<tr>
-            <td>${p.user?.name || p.user?.email || "—"}</td>
-            <td>${p.phone}</td>
-            <td>KES ${fmtMoney(p.amountKes)}</td>
-            <td>$${fmtMoney(p.usdAmount)}</td>
-            <td>${pill(p.status)}</td>
-            <td>${fmtDate(p.createdAt)}</td>
+            <td data-label="User">${p.user?.name || p.user?.email || "—"}</td>
+            <td data-label="Phone">${p.phone}</td>
+            <td data-label="KES">KES ${fmtMoney(p.amountKes)}</td>
+            <td data-label="USD">$${fmtMoney(p.usdAmount)}</td>
+            <td data-label="Status">${pill(p.status)}</td>
+            <td data-label="Date">${fmtDate(p.createdAt)}</td>
             ${
               withActions && p.status === "pending"
-                ? `<td class="row-actions">
+                ? `<td data-label="" class="cell-actions row-actions">
                     <button class="btn-sm pay" onclick="markPaid('${p._id}', '${type}')">Mark paid</button>
                     <button class="btn-sm reject" onclick="rejectPayment('${p._id}', '${type}')">Reject</button>
                    </td>`
                 : withActions
-                ? "<td></td>"
+                ? '<td data-label=""></td>'
                 : ""
             }
           </tr>`
@@ -386,44 +386,12 @@ $("#settingsForm").addEventListener("submit", async (e) => {
   alert("Settings saved");
 });
 
-// Mobile sidebar toggle
-(function () {
-  const sidebar = document.querySelector(".sidebar");
-  const toggle = document.createElement("button");
-  toggle.id = "sidebarToggle";
-  toggle.innerHTML = "&#9776;";
-  toggle.setAttribute("aria-label", "Toggle menu");
-  document.body.appendChild(toggle);
-
-  const backdrop = document.createElement("div");
-  backdrop.id = "sidebarBackdrop";
-  document.body.appendChild(backdrop);
-
-  function openSidebar() {
-    sidebar.classList.add("open");
-    backdrop.classList.add("open");
-  }
-  function closeSidebar() {
-    sidebar.classList.remove("open");
-    backdrop.classList.remove("open");
-  }
-
-  toggle.addEventListener("click", () => {
-    sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+// Keep the active tab scrolled into view when switching on a narrow
+// screen, since the tab strip can scroll horizontally.
+$all(".nav-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   });
-  backdrop.addEventListener("click", closeSidebar);
-
-  // Close sidebar when a nav item is tapped on mobile
-  document.querySelectorAll(".nav-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (window.innerWidth <= 700) closeSidebar();
-    });
-  });
-
-  // If the viewport is resized past the mobile breakpoint, reset state
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 700) closeSidebar();
-  });
-})();
+});
 
 checkSession();

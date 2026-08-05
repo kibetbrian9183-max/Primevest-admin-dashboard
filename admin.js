@@ -386,4 +386,44 @@ $("#settingsForm").addEventListener("submit", async (e) => {
   alert("Settings saved");
 });
 
+// Mobile sidebar toggle
+(function () {
+  const sidebar = document.querySelector(".sidebar");
+  const toggle = document.createElement("button");
+  toggle.id = "sidebarToggle";
+  toggle.innerHTML = "&#9776;";
+  toggle.setAttribute("aria-label", "Toggle menu");
+  document.body.appendChild(toggle);
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "sidebarBackdrop";
+  document.body.appendChild(backdrop);
+
+  function openSidebar() {
+    sidebar.classList.add("open");
+    backdrop.classList.add("open");
+  }
+  function closeSidebar() {
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+
+  toggle.addEventListener("click", () => {
+    sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+  });
+  backdrop.addEventListener("click", closeSidebar);
+
+  // Close sidebar when a nav item is tapped on mobile
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (window.innerWidth <= 700) closeSidebar();
+    });
+  });
+
+  // If the viewport is resized past the mobile breakpoint, reset state
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 700) closeSidebar();
+  });
+})();
+
 checkSession();
